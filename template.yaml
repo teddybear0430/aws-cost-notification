@@ -1,0 +1,21 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  AWS cost notification to LINE.
+
+Resources:
+  CostNotificationLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: go1.x
+      Handler: main
+      CodeUri: ./
+      Timeout: 30
+      MemorySize: 128
+      Policies:
+        - CostNotificationLambda
+        - Statement:
+            - Effect: Allow
+              Action:
+                - "ce:GetCostAndUsag"
+              Resource: "*"
