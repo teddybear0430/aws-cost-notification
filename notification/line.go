@@ -10,13 +10,13 @@ import (
 )
 
 const (
-	BASE_URL = "https://notify-api.line.me/api/notify"
+	BASE_LINE_URL = "https://notify-api.line.me/api/notify"
 )
 
 func SendMessage(message string) {
 	token := os.Getenv("LINE_ACCESS_TOKEN")
 
-	u, err := url.ParseRequestURI(BASE_URL)
+	u, err := url.ParseRequestURI(BASE_LINE_URL)
 	if err != nil {
 		log.Fatal(err)
 	}

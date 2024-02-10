@@ -22,15 +22,21 @@ func HandleRequest(ctx context.Context) (Response, error) {
 
 	// TODO: デバッグ用
 	fmt.Println(result)
+
 	month := result.ResultsByTime[0].TimePeriod
 	cost := result.ResultsByTime[0].Total["UnblendedCost"]
 
-	message := `
-開始月: ` + *month.Start + `
-終了月: ` + *month.End + `
+	amount := *cost.Amount
+	currentJpy := notification.GetCurrentJpy()
+	jpy := notification.ConvertUsDollarToJpy(amount, currentJpy)
 
-今月のAWS利用料金は、` + *cost.Amount + `です。
-`
+	message := `
+	開始月: ` + *month.Start + `
+	終了月: ` + *month.End + `
+
+	今月のAWS利用料金は、` + jpy + `円です。
+	`
+
 	notification.SendMessage(message)
 
 	return Response{

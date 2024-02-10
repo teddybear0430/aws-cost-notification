@@ -44,10 +44,10 @@ func (c *costClient) GetCostMonthly() (*costexplorer.GetCostAndUsageOutput, erro
 		Granularity: aws.String("MONTHLY"),
 		Metrics:     []*string{aws.String("UnblendedCost")},
 		TimePeriod: &costexplorer.DateInterval{
-			Start: aws.String("2023-12-01"),
-			End:   aws.String("2024-01-01"),
-			// Start: aws.String(dateBeforeOneMonth),
-			// End:   aws.String(nowDate),
+			// Start: aws.String("2023-12-01"),
+			// End:   aws.String("2024-01-01"),
+			Start: aws.String(dateBeforeOneMonth),
+			End:   aws.String(nowDate),
 		},
 	}
 

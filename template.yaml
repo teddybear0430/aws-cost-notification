@@ -8,6 +8,7 @@ Globals:
     Environment:
       Variables:
         LINE_ACCESS_TOKEN:
+        OPEN_EXCHANGE_RATES_APP_ID:
 
 Resources:
   CostNotificationLambda:
