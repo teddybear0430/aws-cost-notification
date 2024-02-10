@@ -20,7 +20,18 @@ func HandleRequest(ctx context.Context) (Response, error) {
 		}, err
 	}
 
+	// TODO: デバッグ用
 	fmt.Println(result)
+	month := result.ResultsByTime[0].TimePeriod
+	cost := result.ResultsByTime[0].Total["UnblendedCost"]
+
+	message := `
+開始月: ` + *month.Start + `
+終了月: ` + *month.End + `
+
+今月のAWS利用料金は、` + *cost.Amount + `です。
+`
+	notification.SendMessage(message)
 
 	return Response{
 		StatusCode: 200,

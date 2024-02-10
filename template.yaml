@@ -3,6 +3,12 @@ Transform: AWS::Serverless-2016-10-31
 Description: >
   AWS cost notification to LINE.
 
+Globals:
+  Function:
+    Environment:
+      Variables:
+        LINE_ACCESS_TOKEN:
+
 Resources:
   CostNotificationLambda:
     Type: AWS::Serverless::Function

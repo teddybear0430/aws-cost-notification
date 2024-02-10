@@ -4,6 +4,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/costexplorer"
+	"log/slog"
 	"time"
 )
 
@@ -35,12 +36,18 @@ func (c *costClient) GetCostMonthly() (*costexplorer.GetCostAndUsageOutput, erro
 	dateBeforeOneMonth := oneMonthAgo.Format("2006-01-02")
 	nowDate := c.now.Format("2006-01-02")
 
+	slog.Info("開始月", "start", dateBeforeOneMonth)
+	slog.Info("終了月", "end", nowDate)
+
+	// TODO: 後で実行月の日付を指定するように変える
 	input := &costexplorer.GetCostAndUsageInput{
 		Granularity: aws.String("MONTHLY"),
 		Metrics:     []*string{aws.String("UnblendedCost")},
 		TimePeriod: &costexplorer.DateInterval{
-			Start: aws.String(dateBeforeOneMonth),
-			End:   aws.String(nowDate),
+			Start: aws.String("2023-12-01"),
+			End:   aws.String("2024-01-01"),
+			// Start: aws.String(dateBeforeOneMonth),
+			// End:   aws.String(nowDate),
 		},
 	}
 
