@@ -5,10 +5,11 @@ Description: >
 
 Globals:
  Function:
+   # Go言語を動かすために必要なランタイム
+   # Amazon Linux 2がベースになってる
    Runtime: provided.al2
    Handler: bootstrap
-   Architectures:
-     - x86_64
+   Architectures: [arm64]
    Timeout: 30
    MemorySize: 128
 
@@ -22,7 +23,10 @@ Resources:
   CostNotificationLambda:
     Type: AWS::Serverless::Function
     Metadata:
-      BuildMethod: go1.x
+      # go buildの設定ファイルを指定
+      # Amazon Linux2を使ったカスタムランタイムを使用してLambdaでgoを動かすために必要になる
+      # https://aws.amazon.com/jp/blogs/compute/migrating-aws-lambda-functions-to-al2/
+      BuildMethod: makefile
     Properties:
       Handler: main
       CodeUri: ./
