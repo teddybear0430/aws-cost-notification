@@ -9,23 +9,24 @@ import (
 
 type Response events.APIGatewayProxyResponse
 
+func errorResponse(err error) (Response, error) {
+	return Response{
+		StatusCode: 500,
+		Body:       "Error",
+	}, err
+}
+
 func HandleRequest(ctx context.Context) (Response, error) {
 	api, err := notification.NewApi()
 	if err != nil {
 		log.Fatal(err)
-		return Response{
-			StatusCode: 500,
-			Body:       "Error",
-		}, err
+		errorResponse(err)
 	}
 
 	result, err := notification.GetCostMonthly(api)
 	if err != nil {
 		log.Fatal(err)
-		return Response{
-			StatusCode: 500,
-			Body:       "Error",
-		}, err
+		errorResponse(err)
 	}
 
 	month := result.ResultsByTime[0].TimePeriod
