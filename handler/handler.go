@@ -2,26 +2,31 @@ package handler
 
 import (
 	"context"
-	"fmt"
 	"github.com/Yota-K/aws-cost-notification/notification"
 	"github.com/aws/aws-lambda-go/events"
+	"log"
 )
 
 type Response events.APIGatewayProxyResponse
 
 func HandleRequest(ctx context.Context) (Response, error) {
-	c := notification.NewCostExplorerClient()
-	result, err := c.GetCostMonthly()
-
+	api, err := notification.NewApi()
 	if err != nil {
+		log.Fatal(err)
 		return Response{
 			StatusCode: 500,
 			Body:       "Error",
 		}, err
 	}
 
-	// TODO: デバッグ用
-	fmt.Println(result)
+	result, err := notification.GetCostMonthly(api)
+	if err != nil {
+		log.Fatal(err)
+		return Response{
+			StatusCode: 500,
+			Body:       "Error",
+		}, err
+	}
 
 	month := result.ResultsByTime[0].TimePeriod
 	cost := result.ResultsByTime[0].Total["UnblendedCost"]
@@ -31,11 +36,10 @@ func HandleRequest(ctx context.Context) (Response, error) {
 	jpy := notification.ConvertUsDollarToJpy(amount, currentJpy)
 
 	message := `
-	開始月: ` + *month.Start + `
-	終了月: ` + *month.End + `
+開始月: ` + *month.Start + `
+終了月: ` + *month.End + `
 
-	今月のAWS利用料金は、` + jpy + `円です。
-	`
+今月のAWS利用料金は、` + jpy + `円です。`
 
 	notification.SendMessage(message)
 
