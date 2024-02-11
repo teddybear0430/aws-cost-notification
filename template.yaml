@@ -4,25 +4,52 @@ Description: >
   AWS cost notification to LINE.
 
 Globals:
-  Function:
-    Environment:
-      Variables:
-        LINE_ACCESS_TOKEN:
-        OPEN_EXCHANGE_RATES_APP_ID:
+ Function:
+   Runtime: provided.al2
+   Handler: bootstrap
+   Architectures:
+     - x86_64
+   Timeout: 30
+   MemorySize: 128
+
+Parameters:
+   LineAccessToken:
+     Type: String
+   OpenExchangeRatesAppId:
+     Type: String
 
 Resources:
   CostNotificationLambda:
     Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: go1.x
     Properties:
-      Runtime: go1.x
       Handler: main
       CodeUri: ./
-      Timeout: 30
-      MemorySize: 128
+      Tags:
+        service: "COST_NOTIFICATION_PROD"
+        environment: "PRODUCTION"
+      Environment: 
+        Variables:
+          LINE_ACCESS_TOKEN: !Ref LineAccessToken
+          OPEN_EXCHANGE_RATES_APP_ID: !Ref OpenExchangeRatesAppId
       Policies:
-        - CostNotificationLambda
-        - Statement:
-            - Effect: Allow
-              Action:
-                - "ce:GetCostAndUsag"
-              Resource: "*"
+        # Cost ExplorerにRead onlyの権限を付与
+        # https://docs.aws.amazon.com/ja_jp/serverless-application-model/latest/developerguide/serverless-policy-template-list.html#cost-explorer-readonly-policy
+        - CostExplorerReadOnlyPolicy: {}
+      Events:
+        CostNotificationLambdaSchedule:
+          Type: Schedule
+          Properties:
+            # 月初の朝8:00に実行する
+            #
+            # NOTE
+            #
+            # L: 月または週の最後（EventBridgeで使用できるワイルドカード）
+            # > The L wildcard in the Day-of-month or Day-of-week fields specifies the last day of the month or week.
+            # https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-cron-expressions.html
+            #
+            # cronは分, 時間, 日, 月, 曜日, 年で表すので、指定したcron式は月末の23時00分を表す。
+            # 23時を指定している理由は、タイムゾーンがUTCで指定した時間の9時間後に実行されてしまうため。
+            # 実際に実行したい時間の9時間前を指定することで、月初の朝8時に実行している。
+            Schedule: cron(0 23 L * ? *)
