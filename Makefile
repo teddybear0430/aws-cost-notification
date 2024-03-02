@@ -8,10 +8,10 @@ build-CostNotificationLambda:
 	cp ./bootstrap $(ARTIFACTS_DIR)/.
 
 local_invoke:
-	sam local invoke --parameter-overrides LineAccessToken=$LINE_ACCESS_TOKEN OpenExchangeRatesAppId=$OPEN_EXCHANGE_RATES_APP_ID
+	sam local invoke
 
 deploy:
-	sam deploy --parameter-overrides LineAccessToken=$LINE_ACCESS_TOKEN OpenExchangeRatesAppId=$OPEN_EXCHANGE_RATES_APP_ID
+	sam deploy
 
 test:
 	go test -v ./...
